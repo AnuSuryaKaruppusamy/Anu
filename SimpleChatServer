@@ -1,0 +1,38 @@
+Ex no 4
+
+import java.io.*;
+import java.net.*;
+
+public class SimpleChatServer {
+    public static void main(String[] args) {
+        try (ServerSocket serverSocket = new ServerSocket(12345);
+             Socket clientSocket = serverSocket.accept();
+             BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+             PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
+             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in))) {
+
+            System.out.println("Client connected");
+
+            // Thread to handle messages from client
+            new Thread(() -> {
+                try {
+                    String line;
+                    while ((line = input.readLine()) != null) {
+                        System.out.println("Client: " + line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            // Handle sending messages to client
+            String line;
+            while ((line = userInput.readLine()) != null) {
+                output.println(line);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
